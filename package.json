@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "discord.js": "^14.1.2"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node main.js"
+  }
+}
