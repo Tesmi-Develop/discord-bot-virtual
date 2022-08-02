@@ -29,7 +29,7 @@ export class Command {
      * @param {string} name
      */
     static find(name) {
-        return this.#list.find((command) => command.name === name);
+        return this.#list.find((command) => command.name.toLowerCase() === name);
     }
 
     /**
@@ -56,22 +56,50 @@ export class Command {
     }
 }
 
-Command.add('привет', 'данная команда заставит бота написать "Привет"', (client, message) => {
-    message.reply('Привет');
+Command.add('хелп', 'Отображает все команды и описание к ним.', (client, message) => {
+    let replyMessage = '> **Список всех команд**\n\n';
+    Command.list.forEach((command) => {
+        replyMessage += `> **${command.name}** - *${command.description}*\n`;
+    });
+    message.reply(replyMessage);
 });
 
-Command.add('напиши', 'gg', (client, message, ...args) => {
-    if (args.length == 0) return;
-
-    message.reply(args.join(' '));
-});
-
-Command.add('изменитьКаналИдейНаТекущий', 'данная команда изменит текущий канал под канал для идей', (client, message) => {
+Command.add('идеи', 'Данная команда изменит текущий канал под канал для идей. (Удалит команду сразу, а свое сообщение полсе 10 секунд)', (client, message) => {
     const channelId = message.channelId;
 
     if (Bot.data.servers[message.guildId] === undefined) {
         Data.addServer(Bot.data, message.guildId);
     }
 
-    Bot.data.servers[message.guildId] = {};
+    Bot.data.servers[message.guildId].channelIdeas = channelId;
+    
+    message.reply('Канал изменён!').then((botMessage) => {
+        setTimeout(() => {
+            botMessage.delete();
+        }, 10000);
+    });
+
+    message.delete();
+});
+
+Command.add('идея', 'Напишет идею в канал для идей. (Удаляет команду)', (client, message, ...strs) => {
+    const idea = `> **Пользователь** ${message.author.username} **пердложил новую идею!**\n> ${strs.join(' ')}`;
+
+    const server = Bot.data.servers[message.guildId];
+
+    if (server === undefined) {
+        message.reply('Ваш сервер не зарегестрирован!');
+        return;
+    }
+
+    if (server?.channelIdeas === undefined) {
+        message.reply('Вы не установили канал для идей.');
+        return;
+    }
+
+    client.channels.cache.get(server.channelIdeas).send(idea).then((botMessage) => {
+        botMessage.react('✅');
+        botMessage.react('❌');
+        message.delete();
+    });
 });
