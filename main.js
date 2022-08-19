@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { Command } from './command.js';
 import config from './config.js';
 import Data from './data.js';
+import Site from './web.js';
 
 export default class Bot {
   static debug = true;
