@@ -1,5 +1,5 @@
 export default {
-    token: "MTAwMDM2NDg3NTAyNzA2MjgwNA.GRoRnk.npGPxfFXcl1QAlSJjpSHZHqjuZczH1WvSLfWUE",
+    token: "",
     pathData: "./data.json",
     default: {
         prefix: "$"
